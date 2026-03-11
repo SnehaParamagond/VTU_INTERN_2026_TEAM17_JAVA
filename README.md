@@ -1,3 +1,17 @@
+# VTU Intern Project
+
+Login Page using React.
+
+Technologies used:
+- React
+- HTML
+- CSS
+- JavaScript
+
+Created by Sneha Paramagond.
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
