@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Student Dashboard</title>
+
+<!-- CHART JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- JSPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
+}
+
+body{
+display:flex;
+background:linear-gradient(135deg,#e0f2fe,#f8fafc);
+transition:0.4s;
+}
+
+/* DARK MODE */
+
+.dark-mode{
+background:#0f172a;
+color:white;
+}
+
+.dark-mode .card,
+.dark-mode .profile,
+.dark-mode .chart-box,
+.dark-mode .dropdown-menu{
+background:#1e293b;
+color:white;
+}
+
+.dark-mode .card h3,
+.dark-mode .profile h2,
+.dark-mode .profile p,
+.dark-mode .chart-box h2,
+.dark-mode .topbar h1{
+color:white;
+}
+
+/* NOTIFICATION */
+
+#notification{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#2563eb;
+color:white;
+padding:15px 25px;
+border-radius:12px;
+font-size:16px;
+font-weight:bold;
+display:none;
+z-index:999;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:240px;
+height:100vh;
+background:linear-gradient(180deg,#0f172a,#1e293b);
+color:white;
+padding:25px;
+position:fixed;
+}
+
+.sidebar h2{
+margin-bottom:40px;
+text-align:center;
+font-size:28px;
+}
+
+.sidebar a{
+display:block;
+color:white;
+text-decoration:none;
+padding:14px;
+margin:12px 0;
+border-radius:12px;
+transition:0.3s;
+font-size:17px;
+}
+
+.sidebar a:hover{
+background:#38bdf8;
+}
+
+/* MAIN */
+
+.main{
+margin-left:240px;
+padding:30px;
+width:100%;
+}
+
+/* TOPBAR */
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:30px;
+}
+
+.topbar h1{
+color:#0f172a;
+font-size:32px;
+font-weight:800;
+}
+
+/* MENU */
+
+.menu-container{
+position:relative;
+}
+
+.menu-btn{
+background:#0f172a;
+color:white;
+border:none;
+padding:12px 18px;
+border-radius:12px;
+font-size:24px;
+cursor:pointer;
+}
+
+.dropdown-menu{
+display:none;
+position:absolute;
+right:0;
+top:60px;
+background:white;
+padding:15px;
+border-radius:16px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+width:220px;
+z-index:1000;
+}
+
+.show-menu{
+display:flex;
+flex-direction:column;
+}
+
+.btn{
+padding:12px;
+border:none;
+border-radius:10px;
+color:white;
+cursor:pointer;
+font-weight:bold;
+margin-bottom:10px;
+}
+
+.pdf-btn{
+background:#2563eb;
+}
+
+.dark-btn{
+background:#111827;
+}
+
+.logout-btn{
+background:#ef4444;
+}
+
+/* DASHBOARD SECTION */
+
+.dashboard-container{
+display:flex;
+gap:25px;
+flex-wrap:wrap;
+align-items:flex-start;
+}
+
+/* LEFT SECTION */
+
+.left-section{
+display:flex;
+flex-direction:column;
+gap:25px;
+}
+
+/* CARDS */
+
+.cards{
+display:flex;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.card{
+background:white;
+width:220px;
+padding:25px;
+border-radius:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+.card h3{
+margin-bottom:10px;
+color:#475569;
+}
+
+.card p{
+font-size:36px;
+font-weight:bold;
+}
+
+/* PROFILE */
+
+.profile{
+background:white;
+padding:25px;
+border-radius:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.1);
+width:460px;
+}
+
+.profile h2{
+margin-bottom:20px;
+}
+
+.profile p{
+margin:12px 0;
+}
+
+/* TABLES */
+
+.table-section{
+display:flex;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.table-box{
+background:white;
+padding:20px;
+border-radius:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.1);
+width:320px;
+}
+
+.table-box h2{
+margin-bottom:15px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th{
+background:#2563eb;
+color:white;
+padding:10px;
+}
+
+td{
+padding:10px;
+border-bottom:1px solid #ddd;
+text-align:center;
+}
+
+/* CHARTS */
+
+.charts{
+display:flex;
+gap:20px;
+flex-wrap:wrap;
+justify-content:center;
+margin-top:40px;
+}
+
+.chart-box{
+background:white;
+padding:20px;
+border-radius:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.1);
+width:420px;
+height:350px;
+}
+
+.chart-box h2{
+margin-bottom:15px;
+}
+
+.chart-box canvas{
+width:100% !important;
+height:260px !important;
+}
+
+/* MOBILE RESPONSIVE */
+
+@media(max-width:768px){
+
+.sidebar{
+width:100%;
+height:auto;
+position:relative;
+}
+
+.main{
+margin-left:0;
+padding:15px;
+}
+
+.cards,
+.charts,
+.table-section,
+.dashboard-container{
+flex-direction:column;
+}
+
+.card,
+.profile,
+.chart-box,
+.table-box{
+width:100%;
+}
+
+.topbar{
+flex-direction:column;
+align-items:flex-start;
+gap:15px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- NOTIFICATION -->
+<div id="notification"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+<h2>🎓 Student</h2>
+
+<a href="#">🏠 Dashboard</a>
+<a href="#">📅 Attendance</a>
+<a href="#">📝 Marks</a>
+
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- TOPBAR -->
+<div class="topbar">
+
+<h1 id="welcomeText">Welcome</h1>
+
+<div class="menu-container">
+
+<button class="menu-btn"
+onclick="toggleMenu()">
+
+☰
+
+</button>
+
+<div class="dropdown-menu"
+id="dropdownMenu">
+
+<button class="btn pdf-btn"
+onclick="downloadPDF()">
+
+Download PDF
+
+</button>
+
+<button class="btn dark-btn"
+onclick="toggleDarkMode()">
+
+🌙 Dark Mode
+
+</button>
+
+<button class="btn logout-btn"
+onclick="logout()">
+
+Logout
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard-container">
+
+<!-- LEFT -->
+<div class="left-section">
+
+<!-- CARDS -->
+<div class="cards">
+
+<div class="card">
+
+<h3>Attendance</h3>
+
+<p id="attendance">0%</p>
+
+</div>
+
+<div class="card">
+
+<h3>Average Marks</h3>
+
+<p id="marks">0</p>
+
+</div>
+
+</div>
+
+<!-- PROFILE -->
+<div class="profile">
+
+<div style="text-align:center; margin-bottom:20px;">
+
+<img
+id="profileImage"
+src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+width="100"
+height="100"
+style="
+border-radius:50%;
+object-fit:cover;
+border:4px solid #38bdf8;">
+
+<br><br>
+
+<input type="file"
+id="imageInput"
+accept="image/*"
+onchange="uploadImage()">
+
+</div>
+
+<h2>Student Details</h2>
+
+<p><b>Email:</b> <span id="studentEmail"></span></p>
+
+<p><b>Role:</b> <span id="studentRole"></span></p>
+
+<p><b>Student ID:</b> <span id="studentIdText"></span></p>
+
+</div>
+
+</div>
+
+<!-- TABLES -->
+<div class="table-section">
+
+<!-- ATTENDANCE TABLE -->
+<div class="table-box">
+
+<h2>Attendance</h2>
+
+<table id="attendanceTable">
+
+<tr>
+<th>Date</th>
+<th>Status</th>
+</tr>
+
+</table>
+
+</div>
+
+<!-- MARKS TABLE -->
+<div class="table-box">
+
+<h2>Marks</h2>
+
+<table id="marksTable">
+
+<tr>
+<th>Subject</th>
+<th>Marks</th>
+</tr>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- CHARTS -->
+<div class="charts">
+
+<div class="chart-box">
+
+<h2>📊 Marks Graph</h2>
+
+<canvas id="marksChart"></canvas>
+
+</div>
+
+<div class="chart-box">
+
+<h2>🥧 Attendance Chart</h2>
+
+<canvas id="attendanceChart"></canvas>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/* CHECK LOGIN */
+
+let user = JSON.parse(localStorage.getItem("user"));
+
+if(!user){
+
+window.location.href = "login.html";
+
+}
+
+if(user.role !== "STUDENT"){
+
+alert("Access Denied");
+
+window.location.href = "login.html";
+
+}
+
+/* USER DETAILS */
+
+document.getElementById("welcomeText").innerText =
+"Welcome " + user.email;
+
+document.getElementById("studentEmail").innerText =
+user.email;
+
+document.getElementById("studentRole").innerText =
+user.role;
+
+document.getElementById("studentIdText").innerText =
+user.user_id;
+
+let studentId = user.user_id;
+
+/* ATTENDANCE */
+
+fetch("http://localhost:8080/api/attendance/student/" + studentId)
+
+.then(res => res.json())
+
+.then(data => {
+
+let total = data.length;
+
+let present = 0;
+
+data.forEach(a => {
+
+if(a.status.toLowerCase() === "present"){
+
+present++;
+
+}
+
+document.getElementById("attendanceTable").innerHTML += `
+
+<tr>
+
+<td>${a.date}</td>
+
+<td>${a.status}</td>
+
+</tr>
+
+`;
+
+});
+
+let absent = total - present;
+
+let percentage = 0;
+
+if(total > 0){
+
+percentage = (present / total) * 100;
+
+}
+
+document.getElementById("attendance").innerText =
+percentage.toFixed(0) + "%";
+
+/* PIE CHART */
+
+new Chart(document.getElementById("attendanceChart"), {
+
+type:"pie",
+
+data:{
+
+labels:["Present","Absent"],
+
+datasets:[{
+
+data:[present,absent],
+
+backgroundColor:[
+"#22c55e",
+"#ef4444"
+]
+
+}]
+
+},
+
+options:{
+responsive:true,
+maintainAspectRatio:false
+}
+
+});
+
+});
+
+/* MARKS */
+
+fetch("http://localhost:8080/api/marks/student/" + studentId)
+
+.then(res => res.json())
+
+.then(data => {
+
+let totalMarks = 0;
+
+let subjects = [];
+
+let marksData = [];
+
+data.forEach(m => {
+
+totalMarks += m.marks;
+
+subjects.push(m.subject);
+
+marksData.push(m.marks);
+
+document.getElementById("marksTable").innerHTML += `
+
+<tr>
+
+<td>${m.subject}</td>
+
+<td>${m.marks}</td>
+
+</tr>
+
+`;
+
+});
+
+let avg = totalMarks / data.length;
+
+document.getElementById("marks").innerText =
+avg.toFixed(0);
+
+/* BAR GRAPH */
+
+new Chart(document.getElementById("marksChart"), {
+
+type:"bar",
+
+data:{
+
+labels:subjects,
+
+datasets:[{
+
+label:"Marks",
+
+data:marksData,
+
+backgroundColor:[
+"#38bdf8",
+"#4ade80",
+"#facc15",
+"#fb7185",
+"#a78bfa"
+],
+
+borderRadius:10
+
+}]
+
+},
+
+options:{
+
+responsive:true,
+
+maintainAspectRatio:false,
+
+scales:{
+
+y:{
+beginAtZero:true,
+max:100
+}
+
+}
+
+}
+
+});
+
+});
+
+/* MENU */
+
+function toggleMenu(){
+
+document.getElementById("dropdownMenu")
+.classList.toggle("show-menu");
+
+}
+
+/* DARK MODE */
+
+function toggleDarkMode(){
+
+document.body.classList.toggle("dark-mode");
+
+showNotification(
+"Dark Mode Enabled",
+"#111827"
+);
+
+}
+
+/* PDF */
+function downloadPDF(){
+
+const { jsPDF } = window.jspdf;
+
+const doc = new jsPDF();
+
+/* ===== HEADER ===== */
+
+doc.setFillColor(37,99,235);
+
+doc.rect(0,0,210,35,"F");
+
+doc.setTextColor(255,255,255);
+
+doc.setFontSize(24);
+
+doc.setFont("helvetica","bold");
+
+doc.text(
+"EduTrack Student Report",
+45,
+22
+);
+
+/* ===== RESET COLOR ===== */
+
+doc.setTextColor(0,0,0);
+
+/* ===== MAIN CARD ===== */
+
+doc.setFillColor(248,250,252);
+
+doc.roundedRect(
+15,
+45,
+180,
+110,
+5,
+5,
+"F"
+);
+
+/* ===== PROFILE IMAGE ===== */
+
+let img =
+document.getElementById("profileImage").src;
+
+doc.addImage(
+img,
+"PNG",
+20,
+58,
+38,
+38
+);
+
+/* ===== TITLE ===== */
+
+doc.setFontSize(17);
+
+doc.setFont(
+"helvetica",
+"bold"
+);
+
+doc.text(
+"Student Details",
+70,
+60
+);
+
+/* ===== DETAILS ===== */
+
+doc.setFontSize(13);
+
+doc.setFont(
+"helvetica",
+"normal"
+);
+
+doc.text(
+"Student Email : " + user.email,
+70,
+78
+);
+
+doc.text(
+"Student ID : " + user.user_id,
+70,
+92
+);
+
+doc.text(
+"Role : " + user.role,
+70,
+106
+);
+
+doc.text(
+"Attendance : " +
+document.getElementById("attendance").innerText,
+70,
+120
+);
+
+doc.text(
+"Average Marks : " +
+document.getElementById("marks").innerText,
+70,
+134
+);
+
+/* ===== LINE ===== */
+
+doc.setDrawColor(200);
+
+doc.line(
+20,
+170,
+190,
+170
+);
+
+/* ===== FOOTER ===== */
+
+doc.setFillColor(37,99,235);
+
+doc.rect(
+0,
+280,
+210,
+17,
+"F"
+);
+
+doc.setTextColor(255,255,255);
+
+doc.setFontSize(11);
+
+doc.setFont(
+"helvetica",
+"bold"
+);
+
+doc.text(
+"Generated By EduTrack Student Management System",
+38,
+290
+);
+
+/* ===== SAVE PDF ===== */
+
+doc.save(
+"EduTrack_Report.pdf"
+);
+
+/* ===== NOTIFICATION ===== */
+
+showNotification(
+"Professional PDF Downloaded",
+"#2563eb"
+);
+
+}
+
+/* PROFILE IMAGE */
+
+function uploadImage(){
+
+let file =
+document.getElementById("imageInput").files[0];
+
+if(!file){
+
+return;
+
+}
+
+let reader = new FileReader();
+
+reader.onload = function(e){
+
+let imageUrl = e.target.result;
+
+document.getElementById("profileImage").src =
+imageUrl;
+
+localStorage.setItem(
+"studentProfileImage",
+imageUrl
+);
+
+showNotification(
+"Profile Photo Updated",
+"#22c55e"
+);
+
+};
+
+reader.readAsDataURL(file);
+
+}
+
+/* LOAD IMAGE */
+
+let savedImage =
+localStorage.getItem("studentProfileImage");
+
+if(savedImage){
+
+document.getElementById("profileImage").src =
+savedImage;
+
+}
+
+/* NOTIFICATION */
+
+function showNotification(message,color){
+
+let box =
+document.getElementById("notification");
+
+box.innerText = message;
+
+box.style.background = color;
+
+box.style.display = "block";
+
+setTimeout(()=>{
+
+box.style.display = "none";
+
+},3000);
+
+}
+
+/* LOGOUT */
+
+function logout(){
+
+localStorage.clear();
+
+window.location.href = "login.html";
+
+}
+
+</script>
+
+</body>
+</html>

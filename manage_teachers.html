@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Manage Teachers</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial;
+}
+
+body{
+    background:#f4f7fb;
+}
+
+/* HEADER */
+.header{
+    background:#0f172a;
+    color:white;
+    padding:25px;
+}
+
+.header h1{
+    font-size:40px;
+}
+
+/* CONTAINER */
+.container{
+    padding:30px;
+}
+
+/* CARD */
+.card{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom:30px;
+}
+
+/* INPUTS */
+input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:16px;
+}
+
+/* BUTTON */
+button{
+    padding:10px 18px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:bold;
+    margin-right:5px;
+}
+
+/* BUTTON COLORS */
+.add-btn{
+    background:#2563eb;
+    color:white;
+}
+
+.update-btn{
+    background:#22c55e;
+    color:white;
+}
+
+.delete-btn{
+    background:#ef4444;
+    color:white;
+}
+
+/* TABLE */
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+table th{
+    background:#1e3a8a;
+    color:white;
+    padding:14px;
+    text-align:left;
+}
+
+table td{
+    padding:14px;
+    border-bottom:1px solid #ddd;
+    background:white;
+}
+
+.small-input{
+    width:180px;
+    padding:8px;
+}
+
+.role-box{
+    background:#e2e8f0;
+    padding:8px 12px;
+    border-radius:6px;
+    display:inline-block;
+    font-weight:bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header"
+style="display:flex;
+justify-content:space-between;
+align-items:center;">
+
+<h1>Manage Teachers</h1>
+
+<button onclick="logout()"
+style="
+background:#ef4444;
+color:white;
+border:none;
+padding:10px 18px;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;">
+
+Logout
+
+</button>
+
+</div>
+
+<div class="container">
+
+<!-- ADD TEACHER -->
+<div class="card">
+
+<h2>Add Teacher</h2>
+
+<br>
+
+<input type="text"
+id="name"
+placeholder="Enter Teacher Name">
+
+<input type="email"
+id="email"
+placeholder="Enter Teacher Email">
+
+<input type="password"
+id="password"
+placeholder="Enter Password">
+
+<button class="add-btn"
+onclick="addTeacher()">
+
+Add Teacher
+
+</button>
+
+</div>
+
+<!-- TEACHER LIST -->
+<div class="card">
+
+<h2>Teacher List</h2>
+
+<table>
+
+<tr>
+
+<th>ID</th>
+<th>Name</th>
+<th>Email</th>
+<th>Role</th>
+<th>Actions</th>
+
+</tr>
+
+<tbody id="teacherTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+let user = JSON.parse(localStorage.getItem("user"));
+
+if(!user){
+
+window.location.href = "login.html";
+
+}
+
+function logout(){
+
+localStorage.clear();
+
+window.location.href = "login.html";
+
+}
+
+if(user.role !== "ADMIN"){
+
+alert("Access Denied");
+
+window.location.href = "login.html";
+
+}
+
+/* LOAD TEACHERS */
+
+loadTeachers();
+
+function loadTeachers(){
+
+fetch("http://localhost:8080/api/auth/users")
+
+.then(res => res.json())
+
+.then(data => {
+
+let table =
+document.getElementById("teacherTable");
+
+table.innerHTML = "";
+
+data.forEach(user => {
+
+if(user.role === "TEACHER"){
+
+table.innerHTML += `
+
+<tr>
+
+<td>${user.user_id}</td>
+
+<td>
+
+<input type="text"
+class="small-input"
+id="name${user.user_id}"
+value="${user.name || ''}">
+
+</td>
+
+<td>
+
+<input type="text"
+class="small-input"
+id="email${user.user_id}"
+value="${user.email}">
+
+</td>
+
+<td>
+
+<span class="role-box">
+
+TEACHER
+
+</span>
+
+</td>
+
+<td>
+
+<button class="update-btn"
+onclick="updateTeacher(${user.user_id})">
+
+Update
+
+</button>
+
+<button class="delete-btn"
+onclick="deleteTeacher(${user.user_id})">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+}
+
+});
+
+});
+
+}
+
+/* ADD TEACHER */
+
+function addTeacher(){
+
+let name =
+document.getElementById("name").value;
+
+let email =
+document.getElementById("email").value;
+
+let password =
+document.getElementById("password").value;
+
+fetch("http://localhost:8080/api/auth/signup",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+name:name,
+email:email,
+password:password,
+role:"TEACHER"
+
+})
+
+})
+
+.then(res => res.json())
+
+.then(data => {
+
+alert("Teacher Added Successfully");
+
+document.getElementById("name").value = "";
+document.getElementById("email").value = "";
+document.getElementById("password").value = "";
+
+loadTeachers();
+
+});
+
+}
+
+/* UPDATE TEACHER */
+
+function updateTeacher(id){
+
+let updatedName =
+document.getElementById("name"+id).value;
+
+let updatedEmail =
+document.getElementById("email"+id).value;
+
+fetch("http://localhost:8080/api/auth/update/" + id, {
+
+method:"PUT",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+name:updatedName,
+email:updatedEmail,
+role:"TEACHER"
+
+})
+
+})
+
+.then(res => res.json())
+
+.then(data => {
+
+alert("Teacher Updated Successfully");
+
+loadTeachers();
+
+});
+
+}
+
+/* DELETE TEACHER */
+
+function deleteTeacher(id){
+
+fetch("http://localhost:8080/api/auth/users/" + id,{
+
+method:"DELETE"
+
+})
+
+.then(() => {
+
+alert("Teacher Deleted");
+
+loadTeachers();
+
+});
+
+}
+
+</script>
+
+</body>
+</html>

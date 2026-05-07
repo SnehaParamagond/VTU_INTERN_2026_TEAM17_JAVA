@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Reports Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial;
+}
+
+body{
+    background:#f4f7fb;
+}
+
+/* HEADER */
+.header{
+    background:#0f172a;
+    color:white;
+    padding:25px;
+}
+
+.header h1{
+    font-size:40px;
+}
+
+/* CONTAINER */
+.container{
+    padding:30px;
+}
+
+/* CARDS */
+.cards{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:30px;
+}
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    width:250px;
+}
+
+.card h3{
+    color:#555;
+    margin-bottom:10px;
+}
+
+.card p{
+    font-size:35px;
+    font-weight:bold;
+    color:#1e3a8a;
+}
+
+/* CHART BOX */
+.chart-box{
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+
+    width:700px;
+    height:400px;
+
+    margin-top:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+
+    <h1>Reports Dashboard</h1>
+
+</div>
+
+<!-- CONTAINER -->
+<div class="container">
+
+    <!-- REPORT CARDS -->
+    <div class="cards">
+
+        <div class="card">
+
+            <h3>Total Students</h3>
+
+            <p id="students">0</p>
+
+        </div>
+
+        <div class="card">
+
+            <h3>Total Teachers</h3>
+
+            <p id="teachers">0</p>
+
+        </div>
+
+        <div class="card">
+
+            <h3>Total Users</h3>
+
+            <p id="users">0</p>
+
+        </div>
+
+    </div>
+
+    <!-- CHART -->
+    <div class="chart-box">
+
+        <h2>User Analytics</h2>
+
+        <br>
+
+        <canvas id="reportChart"></canvas>
+
+    </div>
+
+</div>
+
+<script>
+
+/* FETCH USERS */
+
+fetch("http://localhost:8080/api/auth/users")
+
+.then(res => res.json())
+
+.then(data => {
+
+    let students = 0;
+
+    let teachers = 0;
+
+    data.forEach(user => {
+
+        if(user.role === "STUDENT"){
+
+            students++;
+
+        }
+
+        if(user.role === "TEACHER"){
+
+            teachers++;
+
+        }
+
+    });
+
+    /* SET COUNTS */
+
+    document.getElementById("students").innerText =
+    students;
+
+    document.getElementById("teachers").innerText =
+    teachers;
+
+    document.getElementById("users").innerText =
+    students + teachers;
+
+    /* CHART */
+
+    new Chart(document.getElementById("reportChart"), {
+
+        type:"bar",
+
+        data:{
+
+            labels:["Students","Teachers"],
+
+            datasets:[{
+
+                label:"Users",
+
+                data:[students, teachers],
+
+                backgroundColor:[
+                    "#2563eb",
+                    "#22c55e"
+                ],
+
+                borderRadius:10
+
+            }]
+
+        },
+
+        options:{
+
+            responsive:true,
+
+            maintainAspectRatio:false,
+
+            scales:{
+                y:{
+                    beginAtZero:true
+                }
+            }
+
+        }
+
+    });
+
+})
+
+.catch(err => {
+
+    console.log(err);
+
+});
+
+</script>
+
+</body>
+</html>

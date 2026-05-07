@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+body{
+  background: linear-gradient(135deg,#0f172a,#1e3a8a,#0ea5e9);
+  color:white;
+  overflow-x:hidden;
+}
+
+/* NAVBAR */
+nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px 60px;
+  backdrop-filter: blur(10px);
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  font-size:28px;
+  font-weight:bold;
+}
+
+.logo-box{
+  width:42px;
+  height:42px;
+  background:linear-gradient(45deg,#00c6ff,#0072ff);
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-right:10px;
+  font-weight:bold;
+  box-shadow:0 0 15px rgba(0,198,255,0.5);
+}
+
+/* NAV LINKS */
+.nav-links a{
+  margin-left:25px;
+  text-decoration:none;
+  color:white;
+  transition:0.3s;
+  font-size:15px;
+}
+
+.nav-links a:hover{
+  color:#38bdf8;
+}
+
+.login-btn{
+  padding:10px 18px;
+  background:#38bdf8;
+  border-radius:8px;
+  color:black !important;
+  font-weight:bold;
+}
+
+/* HERO SECTION */
+.hero{
+  min-height:85vh;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:60px;
+  gap:50px;
+}
+
+/* TEXT */
+.hero-text{
+  max-width:550px;
+}
+
+.hero-text h1{
+  font-size:58px;
+  line-height:1.2;
+  margin-bottom:20px;
+}
+
+.hero-text span{
+  background:linear-gradient(90deg,#38bdf8,#22d3ee);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.hero-text p{
+  color:#dbeafe;
+  line-height:1.8;
+  margin-bottom:30px;
+  font-size:17px;
+}
+
+.hero-text button{
+  padding:14px 28px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(45deg,#22d3ee,#0ea5e9);
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  font-weight:bold;
+  transition:0.3s;
+  box-shadow:0 10px 25px rgba(14,165,233,0.4);
+}
+
+.hero-text button:hover{
+  transform:translateY(-3px) scale(1.03);
+}
+
+/* IMAGE */
+.hero-img{
+  position:relative;
+}
+
+.hero-img img{
+  width:500px;
+  border-radius:20px;
+  object-fit:cover;
+  box-shadow:0 20px 50px rgba(0,0,0,0.5);
+  animation:float 4s ease-in-out infinite;
+}
+
+/* FLOAT ANIMATION */
+@keyframes float{
+  0%{
+    transform:translateY(0px);
+  }
+  50%{
+    transform:translateY(-10px);
+  }
+  100%{
+    transform:translateY(0px);
+  }
+}
+
+/* FEATURES */
+.features{
+  padding:80px 60px;
+  text-align:center;
+}
+
+.features h2{
+  font-size:38px;
+  margin-bottom:50px;
+}
+
+.cards{
+  display:flex;
+  justify-content:center;
+  gap:30px;
+  flex-wrap:wrap;
+}
+
+.card{
+  width:280px;
+  padding:30px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(12px);
+  transition:0.4s;
+  box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+.card:hover{
+  transform:translateY(-10px);
+  background:rgba(255,255,255,0.15);
+}
+
+.card h3{
+  margin-bottom:15px;
+  font-size:22px;
+}
+
+.card p{
+  color:#dbeafe;
+  line-height:1.6;
+}
+
+/* FOOTER */
+footer{
+  text-align:center;
+  padding:25px;
+  color:#cbd5e1;
+  font-size:14px;
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+
+  nav{
+    padding:20px;
+  }
+
+  .hero{
+    flex-direction:column;
+    text-align:center;
+    padding:40px 20px;
+  }
+
+  .hero-text h1{
+    font-size:42px;
+  }
+
+  .hero-img img{
+    width:100%;
+    max-width:400px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav>
+
+  <div class="logo">
+    <div class="logo-box">E</div>
+    EduTrack
+  </div>
+
+  <div class="nav-links">
+    <a href="#">Home</a>
+    <a href="#features">Features</a>
+    <a href="login.html" class="login-btn">Login</a>
+  </div>
+
+</nav>
+
+<!-- HERO SECTION -->
+<section class="hero">
+
+  <!-- TEXT -->
+  <div class="hero-text">
+
+    <h1>
+      Monitor. Evaluate.<br>
+      <span>Enhance Academic Success</span>
+    </h1>
+
+    <p>
+      Smart platform to manage student records, attendance tracking,
+      academic performance, and real-time insights in one place.
+    </p>
+
+    <!-- FIXED BUTTON -->
+    <button onclick="goToLogin()">
+      Get Started
+    </button>
+
+  </div>
+
+  <!-- IMAGE -->
+  <div class="hero-img">
+
+    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1200&auto=format&fit=crop"
+    alt="Students">
+
+  </div>
+
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+
+  <h2>Core Features</h2>
+
+  <div class="cards">
+
+    <div class="card">
+      <h3>📊 Dashboard</h3>
+      <p>
+        View student statistics, attendance reports,
+        and academic insights in real-time.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>🧑‍🎓 Student Management</h3>
+      <p>
+        Add, edit, update, and manage student
+        records efficiently.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>📝 Attendance & Marks</h3>
+      <p>
+        Track attendance and monitor student
+        performance seamlessly.
+      </p>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer>
+  © 2026 EduTrack | Student Performance & Attendance Analysis System
+</footer>
+
+<!-- JAVASCRIPT -->
+<script>
+
+function goToLogin(){
+    window.location.href = "login.html";
+}
+
+</script>
+
+</body>
+</html>

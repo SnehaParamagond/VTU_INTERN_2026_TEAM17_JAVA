@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Marks</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #1e1e2f;
+            color: white;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 220px;
+            height: 100vh;
+            background: #111827;
+            position: fixed;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            color: #00d4ff;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            margin: 15px 0;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            color: #00d4ff;
+        }
+
+        /* MAIN */
+        .main {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        input {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .save-btn {
+            background: #00d4ff;
+            color: black;
+        }
+
+        .edit-btn {
+            background: #ffc107;
+            color: black;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #111827;
+        }
+
+        tr {
+            background: #2a2a40;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>EduTrack</h2>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="student.html">Students</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="marks.html">Marks</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <h1>Marks</h1>
+
+    <input type="number" id="studentId" placeholder="Student ID">
+    <input type="text" id="subject" placeholder="Subject">
+    <input type="number" id="marks" placeholder="Marks">
+
+    <button class="save-btn" onclick="saveMarks()">Save</button>
+
+    <!-- TABLE -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student ID</th>
+                <th>Subject</th>
+                <th>Marks</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody id="tableBody"></tbody>
+    </table>
+
+</div>
+
+<script>
+
+let editId = null;
+
+// LOAD
+function loadMarks() {
+    fetch("http://localhost:8080/api/marks")
+    .then(res => res.json())
+    .then(data => {
+        let rows = "";
+
+        data.forEach(m => {
+            rows += `
+            <tr>
+                <td>${m.marksId}</td>
+                <td>${m.studentId}</td>
+                <td>${m.subject}</td>
+                <td>${m.marks}</td>
+                <td>
+                    <button class="edit-btn" onclick="edit(${m.marksId}, ${m.studentId}, '${m.subject}', ${m.marks})">Edit</button>
+                    <button class="delete-btn" onclick="deleteMarks(${m.marksId})">Delete</button>
+                </td>
+            </tr>`;
+        });
+
+        document.getElementById("tableBody").innerHTML = rows;
+    });
+}
+
+// SAVE / UPDATE
+function saveMarks() {
+    let studentId = document.getElementById("studentId").value;
+    let subject = document.getElementById("subject").value;
+    let marks = document.getElementById("marks").value;
+
+    let url = editId 
+        ? "http://localhost:8080/api/marks/" + editId
+        : "http://localhost:8080/api/marks";
+
+    let method = editId ? "PUT" : "POST";
+
+    fetch(url, {
+        method: method,
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            marksId: editId,
+            studentId: parseInt(studentId),
+            subject: subject,
+            marks: parseInt(marks)
+        })
+    })
+    .then(res => res.json())
+    .then(() => {
+        alert(editId ? "Updated" : "Saved");
+        editId = null;
+        loadMarks();
+    });
+}
+
+// DELETE
+function deleteMarks(id) {
+    fetch("http://localhost:8080/api/marks/" + id, {
+        method: "DELETE"
+    })
+    .then(() => {
+        alert("Deleted");
+        loadMarks();
+    });
+}
+
+// EDIT
+function edit(id, studentId, subject, marks) {
+    editId = id;
+
+    document.getElementById("studentId").value = studentId;
+    document.getElementById("subject").value = subject;
+    document.getElementById("marks").value = marks;
+}
+
+// LOAD ON START
+loadMarks();
+
+</script>
+
+</body>
+</html>

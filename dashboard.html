@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>EduTrack Dashboard</title>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  background: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f') no-repeat center/cover;
+}
+
+/* Overlay */
+body::before {
+  content: "";
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  z-index: -1;
+}
+
+/* Sidebar (UNCHANGED LIKE YOUR OLD ONE) */
+.sidebar {
+  width: 230px;
+  background: rgba(30, 39, 46, 0.9);
+  color: white;
+  height: 100vh;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.sidebar a {
+  display: block;
+  color: white;
+  padding: 12px;
+  margin: 10px 0;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.sidebar a:hover {
+  background: #00cec9;
+  transform: translateX(5px);
+}
+
+/* Main */
+.main {
+  flex: 1;
+  padding: 30px;
+  color: white;
+}
+
+/* Topbar */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Cards */
+.cards {
+  display: flex;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.card {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  padding: 25px;
+  border-radius: 15px;
+  width: 220px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+}
+
+.card p {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+/* SMALL CLEAN CHART (NOT UGLY) */
+.chart-box {
+  margin-top: 40px;
+  width: 380px;
+  padding: 15px;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.12);
+}
+</style>
+</head>
+
+<body>
+
+<!-- ✅ YOUR ORIGINAL SIDEBAR (RESTORED) -->
+<div class="sidebar">
+  <h2>EduTrack</h2>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="student.html">👨‍🎓 Students</a>
+  <a href="attendance.html">📊 Attendance</a>
+  <a href="marks.html">📈 Marks</a>
+  <a href="teacher.html">👩‍🏫 Teachers</a>
+  <a href="#" onclick="logout()">🚪 Logout</a>
+  <a href="settings.html">⚙ Settings</a>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <div class="topbar">
+    <h2>Dashboard</h2>
+    <p id="welcome"></p>
+  </div>
+
+  <h1>EduTrack Analytics</h1>
+
+  <!-- Cards -->
+  <div class="cards">
+    <div class="card">
+      <h3>Total Users</h3>
+      <p id="totalUsers">0</p>
+    </div>
+
+    <div class="card">
+      <h3>Students</h3>
+      <p id="students">0</p>
+    </div>
+
+    <div class="card">
+      <h3>Teachers</h3>
+      <p id="teachers">0</p>
+    </div>
+  </div>
+
+  <!-- SIMPLE CLEAN CHART -->
+  <div class="chart-box">
+    <canvas id="myChart"></canvas>
+  </div>
+
+</div>
+
+<script>
+
+// login protection
+let user = JSON.parse(localStorage.getItem("user"));
+if(!user){
+  window.location.href = "login.html";
+}
+
+// clean name
+let name = user.email.split("@")[0];
+document.getElementById("welcome").innerText = "Welcome " + name;
+
+// fetch data
+fetch("http://localhost:8080/api/dashboard/stats")
+.then(res => res.json())
+.then(data => {
+
+  document.getElementById("totalUsers").innerText = data.totalUsers;
+  document.getElementById("students").innerText = data.students;
+  document.getElementById("teachers").innerText = data.teachers;
+
+  new Chart(document.getElementById("myChart"), {
+    type: 'bar',
+    data: {
+      labels: ['Students', 'Teachers'],
+      datasets: [{
+        data: [data.students, data.teachers],
+        backgroundColor: ['#00cec9', '#ff7675']
+      }]
+    },
+    options: {
+      animation: { duration: 1200 },
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: 'white' } },
+        y: { ticks: { color: 'white' } }
+      }
+    }
+  });
+
+});
+
+// logout
+function logout(){
+  localStorage.removeItem("user");
+  window.location.href = "login.html";
+}
+
+</script>
+
+</body>
+</html>

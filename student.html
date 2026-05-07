@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Students</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            background: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f') no-repeat center/cover;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: -1;
+        }
+
+        .sidebar {
+            width: 230px;
+            background: rgba(30, 39, 46, 0.9);
+            color: white;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 12px;
+            margin: 10px 0;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background: #00cec9;
+        }
+
+        .main {
+            flex: 1;
+            padding: 30px;
+            color: white;
+        }
+
+        input {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            padding: 8px 12px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-btn { background: #00cec9; color: white; }
+        .delete-btn { background: red; color: white; }
+        .edit-btn { background: orange; color: white; }
+
+        table {
+            width: 90%;
+            margin-top: 20px;
+            background: rgba(255,255,255,0.15);
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>EduTrack</h2>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="student.html">Students</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+
+        <h2>Student Management</h2>
+
+        <input id="name" placeholder="Name">
+        <input id="dept" placeholder="Department">
+        <input id="year" placeholder="Year">
+
+        <button class="add-btn" onclick="addStudent()">Add</button>
+
+        <table id="table">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Dept</th>
+                <th>Year</th>
+                <th>Actions</th>
+            </tr>
+        </table>
+
+    </div>
+
+    <script>
+
+        let editId = null;
+
+        // ADD / UPDATE
+        function addStudent() {
+            let name = document.getElementById("name").value;
+            let department = document.getElementById("dept").value;
+            let year = document.getElementById("year").value;
+
+            if (name === "" || department === "" || year === "") {
+                alert("Please fill all fields ❗");
+                return;
+            }
+
+            let url = "http://localhost:8080/api/students";
+            let method = "POST";
+
+            if (editId != null) {
+                url += "/" + editId;
+                method = "PUT";
+            }
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: name,
+                    department: department,
+                    year: parseInt(year)
+                })
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("Server error");
+                }
+                return res.json();
+            })
+            .then(() => {
+                alert("Saved ✅");
+                editId = null;
+                clearForm();
+                loadStudents();
+            })
+            .catch(err => {
+                console.log(err);
+                alert("Error saving ❌");
+            });
+        }
+
+        // LOAD
+        function loadStudents() {
+            fetch("http://localhost:8080/api/students")
+                .then(res => res.json())
+                .then(data => {
+                    let table = document.getElementById("table");
+
+                    table.innerHTML = `
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Dept</th>
+                            <th>Year</th>
+                            <th>Actions</th>
+                        </tr>
+                    `;
+
+                    data.forEach(s => {
+                        table.innerHTML += `
+                            <tr>
+                                <td>${s.id}</td>
+                                <td>${s.name}</td>
+                                <td>${s.department}</td>
+                                <td>${s.year}</td>
+                                <td>
+                                    <button class="edit-btn" onclick="editStudent(${s.id}, '${s.name}', '${s.department}', ${s.year})">Edit</button>
+                                    <button class="delete-btn" onclick="deleteStudent(${s.id})">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                });
+        }
+
+        // DELETE
+        function deleteStudent(id) {
+            fetch("http://localhost:8080/api/students/" + id, {
+                method: "DELETE"
+            })
+            .then(() => {
+                alert("Deleted ❌");
+                loadStudents();
+            });
+        }
+
+        // EDIT
+        function editStudent(id, name, dept, year) {
+            editId = id;
+            document.getElementById("name").value = name;
+            document.getElementById("dept").value = dept;
+            document.getElementById("year").value = year;
+        }
+
+        // CLEAR
+        function clearForm() {
+            document.getElementById("name").value = "";
+            document.getElementById("dept").value = "";
+            document.getElementById("year").value = "";
+        }
+
+        // LOGOUT
+        function logout() {
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+        }
+
+        // LOAD ON START
+        window.onload = loadStudents;
+
+    </script>
+
+</body>
+</html>

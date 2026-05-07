@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>EduTrack Signup</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  height: 100vh;
+  background: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f') no-repeat center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Overlay */
+body::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+}
+
+/* Box */
+.signup-box {
+  position: relative;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+input, select {
+  width: 90%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background: #00b894;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #019875;
+}
+
+.small {
+  margin-top: 10px;
+}
+
+.small a {
+  color: #00b894;
+  text-decoration: none;
+  font-weight: bold;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="signup-box">
+  <h2>Create Account</h2>
+
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+
+  <select id="role">
+    <option value="ADMIN">Admin</option>
+    <option value="TEACHER">Teacher</option>
+    <option value="STUDENT">Student</option>
+  </select>
+
+  <button onclick="signup()">Signup</button>
+
+  <div class="small">
+    Already have an account? <a href="login.html">Login</a>
+  </div>
+</div>
+
+<script>
+function signup() {
+  let email = document.getElementById("email").value;
+  let password = document.getElementById("password").value;
+  let role = document.getElementById("role").value;
+
+  if(email === "" || password === "") {
+    alert("Please fill all fields");
+    return;
+  }
+
+  fetch("http://localhost:8080/api/auth/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password, role })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert("Signup successful ✅");
+    window.location.href = "login.html";
+  })
+  .catch(err => {
+    alert("Error while signup ❌");
+  });
+}
+</script>
+
+</body>
+</html>

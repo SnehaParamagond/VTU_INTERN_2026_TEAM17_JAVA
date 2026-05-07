@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Admin Dashboard</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    display:flex;
+    background:#f5f6fa;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:220px;
+    background:#2f3640;
+    color:white;
+    padding:20px;
+    height:100vh;
+}
+
+.sidebar h2{
+    margin-bottom:30px;
+}
+
+.sidebar a{
+    display:block;
+    color:white;
+    padding:12px;
+    margin:10px 0;
+    text-decoration:none;
+    border-radius:8px;
+    transition:0.3s;
+}
+
+.sidebar a:hover{
+    background:#40739e;
+}
+
+/* MAIN */
+
+.main{
+    flex:1;
+    padding:30px;
+}
+
+/* CARDS */
+
+.cards{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    width:220px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.card h3{
+    margin:0;
+    color:#555;
+}
+
+.card p{
+    font-size:32px;
+    font-weight:bold;
+    margin-top:10px;
+    color:#2f3640;
+}
+
+/* TOPBAR */
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.logout-btn{
+    background:red;
+    color:white;
+    border:none;
+    padding:10px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <h2>Admin</h2>
+
+    <a href="admin.html">🏠 Dashboard</a>
+
+    <a href="manage_students.html">
+    👨‍🎓 Manage Students
+    </a>
+
+    <a href="manage_teachers.html">
+    👩‍🏫 Manage Teachers
+    </a>
+
+    <a href="reports.html">
+    📊 Reports
+    </a>
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+        <h1>Admin Dashboard</h1>
+
+        <button class="logout-btn" onclick="logout()">
+            Logout
+        </button>
+
+    </div>
+
+    <!-- CARDS -->
+
+    <div class="cards">
+
+        <div class="card">
+
+            <h3>Total Students</h3>
+
+            <p id="studentCount">0</p>
+
+        </div>
+
+        <div class="card">
+
+            <h3>Teachers</h3>
+
+            <p id="teacherCount">0</p>
+
+        </div>
+
+        <div class="card">
+
+            <h3>Reports</h3>
+
+            <p>Available</p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+/* CHECK LOGIN */
+
+let user = JSON.parse(localStorage.getItem("user"));
+
+if(!user){
+
+    window.location.href = "login.html";
+
+}
+
+if(user.role !== "ADMIN"){
+
+    alert("Access Denied");
+
+    window.location.href = "login.html";
+
+}
+
+/* FETCH USERS */
+
+fetch("http://localhost:8080/api/auth/users")
+
+.then(res => res.json())
+
+.then(data => {
+
+    let students = 0;
+
+    let teachers = 0;
+
+    data.forEach(user => {
+
+        if(user.role === "STUDENT"){
+
+            students++;
+
+        }
+
+        if(user.role === "TEACHER"){
+
+            teachers++;
+
+        }
+
+    });
+
+    document.getElementById("studentCount").innerText =
+    students;
+
+    document.getElementById("teacherCount").innerText =
+    teachers;
+
+})
+
+.catch(err => {
+
+    console.log(err);
+
+});
+
+/* LOGOUT */
+
+function logout(){
+
+    localStorage.clear();
+
+    window.location.href = "login.html";
+
+}
+
+</script>
+
+</body>
+</html>

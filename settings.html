@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Settings - EduTrack</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI';
+  background: #0f172a;
+  color: white;
+}
+
+/* DARK MODE */
+body.light {
+  background: #f1f5f9;
+  color: black;
+}
+
+/* CONTAINER */
+.container {
+  padding: 40px;
+}
+
+/* CARD */
+.card {
+  background: rgba(255,255,255,0.1);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+}
+
+body.light .card {
+  background: white;
+}
+
+/* INPUT */
+input, select {
+  width: 250px;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: none;
+}
+
+/* BUTTON */
+button {
+  padding: 10px 20px;
+  background: #38bdf8;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* PROFILE IMAGE */
+.profile-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+/* TOGGLE */
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>⚙ Advanced Settings</h1>
+
+<!-- PROFILE -->
+<div class="card">
+  <h3>👤 Profile</h3>
+
+  <img id="preview" class="profile-img" src="https://via.placeholder.com/100">
+
+  <br>
+  <input type="file" onchange="uploadImage(event)"><br>
+
+  <input type="text" id="name" placeholder="Enter Name"><br>
+  <input type="email" id="email" placeholder="Enter Email"><br>
+
+  <button onclick="saveProfile()">Save Profile</button>
+</div>
+
+<!-- ROLE BASED -->
+<div class="card">
+  <h3>🎯 Role Settings</h3>
+
+  <select id="role" onchange="showRoleSettings()">
+    <option value="">Select Role</option>
+    <option value="ADMIN">Admin</option>
+    <option value="TEACHER">Teacher</option>
+    <option value="STUDENT">Student</option>
+  </select>
+
+  <div id="roleContent"></div>
+</div>
+
+<!-- DARK MODE -->
+<div class="card">
+  <h3>🌙 Appearance</h3>
+
+  <div class="toggle">
+    <label>Dark Mode</label>
+    <input type="checkbox" id="darkToggle" onchange="toggleDark()">
+  </div>
+</div>
+
+<!-- LOGOUT -->
+<div class="card">
+  <h3>🚪 Logout</h3>
+  <button onclick="logout()">Logout</button>
+</div>
+
+</div>
+
+<script>
+
+/* LOAD USER */
+let user = JSON.parse(localStorage.getItem("user")) || {};
+
+document.getElementById("name").value = user.name || "";
+document.getElementById("email").value = user.email || "";
+document.getElementById("role").value = user.role || "";
+
+if(user.image){
+  document.getElementById("preview").src = user.image;
+}
+
+/* PROFILE SAVE */
+function saveProfile(){
+  user.name = document.getElementById("name").value;
+  user.email = document.getElementById("email").value;
+
+  localStorage.setItem("user", JSON.stringify(user));
+  alert("Profile Saved ✅");
+}
+
+/* IMAGE UPLOAD */
+function uploadImage(event){
+  let file = event.target.files[0];
+  let reader = new FileReader();
+
+  reader.onload = function(){
+    document.getElementById("preview").src = reader.result;
+    user.image = reader.result;
+  }
+
+  reader.readAsDataURL(file);
+}
+
+/* ROLE BASED UI */
+function showRoleSettings(){
+  let role = document.getElementById("role").value;
+  user.role = role;
+
+  let content = "";
+
+  if(role === "ADMIN"){
+    content = "<p>👑 Admin can manage all users, teachers, and system settings.</p>";
+  }
+  else if(role === "TEACHER"){
+    content = "<p>📚 Teacher can manage attendance and student marks.</p>";
+  }
+  else if(role === "STUDENT"){
+    content = "<p>🎓 Student can view marks and attendance records.</p>";
+  }
+
+  document.getElementById("roleContent").innerHTML = content;
+
+  localStorage.setItem("user", JSON.stringify(user));
+}
+
+/* DARK MODE */
+function toggleDark(){
+  let isDark = document.getElementById("darkToggle").checked;
+
+  if(isDark){
+    document.body.classList.remove("light");
+    localStorage.setItem("theme", "dark");
+  } else {
+    document.body.classList.add("light");
+    localStorage.setItem("theme", "light");
+  }
+}
+
+/* LOAD THEME */
+let theme = localStorage.getItem("theme");
+if(theme === "light"){
+  document.body.classList.add("light");
+  document.getElementById("darkToggle").checked = false;
+} else {
+  document.getElementById("darkToggle").checked = true;
+}
+
+/* LOGOUT */
+function logout(){
+  localStorage.removeItem("user");
+  window.location.href = "login.html";
+}
+
+/* INIT ROLE */
+showRoleSettings();
+
+</script>
+
+</body>
+</html>
